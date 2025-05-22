@@ -3,3 +3,52 @@
     padding: 0;
     box-sizing: border-box;
 }
+
+body {
+    height: 100vh;
+    background-color:  #01161e
+}
+
+.container{
+    font-size: 16px;
+    width: 90vw;
+    max-width: 37.5rem;
+    padding: 3rem 1.8em;
+    background-color: #001017;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    border-radius: 0.8rem;
+    box-shadow: 1.2em 2em 3em rgba(0, 0, 0, 0.2);
+}
+
+.movie-search{
+    display: grid;
+    grid-template-columns: 9fr 3fr;
+    gap: 1.2em;
+}
+
+.movie-search input,
+.movie-search button{
+    font-size: 0.9em;
+    outline: none;
+    border-radius: 0.4rem;
+}
+
+.movie-search input{
+    background-color: transparent;
+    border: 1px solid #676060;
+    padding: 0.7em;
+    color: #ffffff
+}
+
+.movie-search input:focus {
+    border-color: #ffffff;
+}
+
+.movie-search button {
+    background-color: #FFD700;
+    border: none;
+    cursor: pointer;
+}
