@@ -5,12 +5,13 @@
 }
 
 body {
-    height: 100vh;
+    min-height: 100vh;
     background-color: #01161e;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
 }
 
 .container {
@@ -208,4 +209,32 @@ p {
 
 .dropdown-item:hover {
     background-color: #333;
+}
+
+.movie-list-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1em;
+    margin-top: 1em;
+}
+
+.movie-item {
+    background-color: #1a2529;
+    border-radius: 0.4rem;
+    padding: 0.6em;
+    text-align: center;
+    cursor: pointer;
+}
+
+.movie-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 0.4rem;
+    margin-bottom: 0.5em;
+}
+
+.movie-item span {
+    color: #ffffff;
+    font-size: 0.85em;
+    font-weight: 300;
 }

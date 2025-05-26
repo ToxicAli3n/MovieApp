@@ -4,12 +4,27 @@ const searchInput = document.getElementById('search');
 const searchButton = document.getElementById('search-button');
 const resultContainer = document.getElementById('result');
 const dropdown = document.getElementById('dropdown');
+const movieListContainer = document.getElementById('movie-list-container');
 
 async function fetchMovie(query) {
     try {
-        resultContainer.innerHTML = `<p class="msg">Loading...</p>`;
+        resultContainer.innerHTML = `<p class="msg">Please select a movie</p>`;
+        movieListContainer.innerHTML = `<p class="msg">Loading movies...</p>`;
         
-        const res = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&t=${query}`);
+        await fetchMovies(query);
+    } catch (err) {
+        resultContainer.innerHTML = `<p class="msg">Error fetching data</p>`;
+        movieListContainer.innerHTML = '';
+        console.error(err);
+    }
+}
+
+async function fetchMovieDetails(title) {
+    try {
+        resultContainer.innerHTML = `<p class="msg">Loading...</p>`;
+        movieListContainer.innerHTML = '';
+        
+        const res = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&t=${title}`);
         const data = await res.json();
         
         if (data.Response === 'False') {
@@ -20,6 +35,25 @@ async function fetchMovie(query) {
         displayMovie(data);
     } catch (err) {
         resultContainer.innerHTML = `<p class="msg">Error fetching movie data</p>`;
+        console.error(err);
+    }
+}
+
+async function fetchMovies(query) {
+    try {
+        const res = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`);
+        const data = await res.json();
+        
+        if (data.Response === 'False') {
+            movieListContainer.innerHTML = `<p class="msg">No movies found</p>`;
+            return;
+        }
+        
+        const limitedResults = data.Search.slice(0, 8);
+        
+        displayMovies(limitedResults);
+    } catch (err) {
+        movieListContainer.innerHTML = `<p class="msg">Error fetching movies</p>`;
         console.error(err);
     }
 }
@@ -49,6 +83,15 @@ function displayMovie(movie) {
     <h3>Cast:</h3>
     <p>${movie.Actors}</p>
   `;
+}
+
+function displayMovies(movies) {
+    movieListContainer.innerHTML = movies.map(movie => `
+        <div class="movie-item" data-title="${movie.Title}">
+            <img src="${movie.Poster !== 'N/A' ? movie.Poster : 'no-image.jpg'}" alt="${movie.Title}">
+            <span>${movie.Title} (${movie.Year})</span>
+        </div>
+    `).join('');
 }
 
 searchButton.addEventListener('click', () => {
@@ -108,7 +151,16 @@ dropdown.addEventListener('click', (e) => {
         const title = item.dataset.title;
         searchInput.value = title;
         dropdown.style.display = 'none';
-        fetchMovie(title);
+        fetchMovieDetails(title);
+    }
+});
+
+movieListContainer.addEventListener('click', (e) => {
+    const item = e.target.closest('.movie-item');
+    if (item) {
+        const title = item.dataset.title;
+        searchInput.value = title;
+        fetchMovieDetails(title);
     }
 });
 
