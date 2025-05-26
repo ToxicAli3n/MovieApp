@@ -133,3 +133,58 @@ p {
 .msg {
     text-align: center;
 }
+
+.search-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.search-wrapper input {
+    width: 100%;
+    background-color: transparent;
+    border: 1px solid #676060;
+    padding: 0.7em;
+    color: #ffffff;
+    font-size: 0.9em;
+    outline: none;
+    border-radius: 0.4rem;
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #001017;
+    border: 1px solid #676060;
+    border-top: none;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 10;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    padding: 0.6em;
+    cursor: pointer;
+}
+
+.dropdown-item img {
+    width: 40px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.dropdown-item span {
+    color: #ffffff;
+    font-size: 0.9em;
+}
+
+.dropdown-item:hover {
+    background-color: #333;
+}
+
