@@ -6,41 +6,42 @@
 
 body {
     height: 100vh;
-    background-color:  #01161e
+    background-color: #01161e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 1.5rem;
 }
 
-.container{
+.container {
     font-size: 16px;
     width: 90vw;
     max-width: 37.5rem;
     padding: 3rem 1.8em;
     background-color: #001017;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    top: 50%;
-    left: 50%;
+    margin: 0;
     border-radius: 0.8rem;
     box-shadow: 1.2em 2em 3em rgba(0, 0, 0, 0.2);
 }
 
-.movie-search{
+.movie-search {
     display: grid;
     grid-template-columns: 9fr 3fr;
     gap: 1.2em;
 }
 
 .movie-search input,
-.movie-search button{
+.movie-search button {
     font-size: 0.9em;
     outline: none;
     border-radius: 0.4rem;
 }
 
-.movie-search input{
+.movie-search input {
     background-color: transparent;
     border: 1px solid #676060;
     padding: 0.7em;
-    color: #ffffff
+    color: #ffffff;
 }
 
 .movie-search input:focus {
@@ -159,9 +160,30 @@ p {
     background-color: #001017;
     border: 1px solid #676060;
     border-top: none;
-    max-height: 300px;
+    max-height: 200px;
     overflow-y: auto;
     z-index: 10;
+
+    scrollbar-width: thin;
+    scrollbar-color: #FFD700 #001017;
+}
+
+.dropdown::-webkit-scrollbar {
+    width: 8px;
+}
+
+.dropdown::-webkit-scrollbar-track {
+    background: #001017;
+    border-radius: 0.4rem;
+}
+
+.dropdown::-webkit-scrollbar-thumb {
+    background: #FFD700;
+    border-radius: 0.4rem;
+}
+
+.dropdown::-webkit-scrollbar-button {
+    display: none;
 }
 
 .dropdown-item {
@@ -187,4 +209,3 @@ p {
 .dropdown-item:hover {
     background-color: #333;
 }
-
