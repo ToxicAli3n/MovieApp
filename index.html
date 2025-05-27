@@ -13,22 +13,29 @@
 </head>
 <body>
 <div class="container">
-    <div class="movie-search">
-        <div class="search-wrapper">
-            <input
-                    type="text"
-                    placeholder="Search Movie"
-                    id="search"
-            />
-            <div class="dropdown" id="dropdown"></div>
+    <div class="main-content">
+        <div class="movie-search">
+            <div class="search-wrapper">
+                <input
+                       type="text"
+                       placeholder="Search Movie"
+                       id="search"
+                />
+                <div class="dropdown" id="dropdown"></div>
+            </div>
+            <button id="search-button">Search</button>
         </div>
-        <button id="search-button">Search</button>
+
+        <div id="result"></div>
+        <div id="movie-list">
+            <div id="movie-list-container" class="movie-list-container"></div>
+        </div>
     </div>
 
-    <div id="result"></div>
-    <div id="movie-list">
-        <div id="movie-list-container" class="movie-list-container"></div>
-    </div>
+    <aside class="sidebar">
+        <button id="show-favorites" title="Favorites">❤️</button>
+        <button id="show-history" title="History">🕓</button>
+    </aside>
 </div>
 </body>
 </html>

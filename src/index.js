@@ -5,6 +5,7 @@ const searchButton = document.getElementById('search-button');
 const resultContainer = document.getElementById('result');
 const dropdown = document.getElementById('dropdown');
 const movieListContainer = document.getElementById('movie-list-container');
+const showFavoritesButton = document.getElementById('show-favorites');
 
 async function fetchMovie(query) {
     try {
@@ -67,7 +68,7 @@ function displayMovie(movie) {
       <div>
         <h2>${movie.Title}</h2>
         <div class="rating">
-          <img src="star-icon.png" alt="Star">
+          <img src="star-icon.png" alt="Star" width="20">
           <h4>${movie.imdbRating}</h4>
         </div>
         <div class="details">
@@ -76,6 +77,7 @@ function displayMovie(movie) {
           <span>${movie.Runtime}</span>
         </div>
         <div class="genre">${genres}</div>
+        <button id="add-favorite" data-title="${movie.Title}">❤️ Add to Favorites</button>
       </div>
     </div>
     <h3>Plot:</h3>
@@ -83,6 +85,10 @@ function displayMovie(movie) {
     <h3>Cast:</h3>
     <p>${movie.Actors}</p>
   `;
+    
+    document.getElementById('add-favorite').addEventListener('click', () => {
+        addToFavorites(movie);
+    });
 }
 
 function displayMovies(movies) {
@@ -92,6 +98,56 @@ function displayMovies(movies) {
             <span>${movie.Title} (${movie.Year})</span>
         </div>
     `).join('');
+}
+
+function addToFavorites(movie) {
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    const exists = favorites.some(f => f.imdbID === movie.imdbID);
+    if (!exists) {
+        favorites.push({
+            imdbID: movie.imdbID,
+            Title: movie.Title,
+            Year: movie.Year,
+            Poster: movie.Poster
+        });
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+        alert(`${movie.Title} added to favorites!`);
+    } else {
+        alert(`${movie.Title} is already in favorites.`);
+    }
+}
+
+function showFavorites() {
+    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    if (favorites.length === 0) {
+        movieListContainer.innerHTML = `<p class="msg">No favorite movies yet.</p>`;
+        resultContainer.innerHTML = `<p class="msg">Please select a movie</p>`;
+        return;
+    }
+    
+    movieListContainer.innerHTML = favorites.map(movie => `
+        <div class="movie-item" data-title="${movie.Title}">
+            <img src="${movie.Poster !== 'N/A' ? movie.Poster : 'no-image.jpg'}" alt="${movie.Title}">
+            <span>${movie.Title} (${movie.Year})</span>
+            <button class="remove-favorite" data-id="${movie.imdbID}" title="Remove from favorites">✖</button>
+        </div>
+    `).join('');
+    resultContainer.innerHTML = `<p class="msg">Click a movie to view details.</p>`;
+    
+    document.querySelectorAll('.remove-favorite').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.stopPropagation();
+            removeFromFavorites(e.target.dataset.id);
+        });
+    });
+}
+
+function removeFromFavorites(imdbID) {
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    favorites = favorites.filter(movie => movie.imdbID !== imdbID);
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+    alert('Movie removed from favorites!');
+    showFavorites();
 }
 
 searchButton.addEventListener('click', () => {
@@ -169,3 +225,5 @@ document.addEventListener('click', (e) => {
         dropdown.style.display = 'none';
     }
 });
+
+showFavoritesButton.addEventListener('click', showFavorites);
