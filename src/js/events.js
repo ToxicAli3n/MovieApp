@@ -1,12 +1,14 @@
 import { API_KEY } from '../config/config.js';
 import { fetchMovie, fetchMovieDetails } from './api.js';
 import { showFavorites } from './favorites.js';
+import { showHistory } from './history.js';
 
 const searchInput = document.getElementById('search');
 const searchButton = document.getElementById('search-button');
 const dropdown = document.getElementById('dropdown');
 const movieListContainer = document.getElementById('movie-list-container');
 const showFavoritesButton = document.getElementById('show-favorites');
+const showHistoryButton = document.getElementById('show-history');
 
 searchButton.addEventListener('click', () => {
     const query = searchInput.value.trim();
@@ -74,7 +76,6 @@ movieListContainer.addEventListener('click', (e) => {
     const item = e.target.closest('.movie-item');
     if (item) {
         const title = item.dataset.title;
-        searchInput.value = title;
         fetchMovieDetails(title);
     }
 });
@@ -86,3 +87,4 @@ document.addEventListener('click', (e) => {
 });
 
 showFavoritesButton.addEventListener('click', showFavorites);
+showHistoryButton.addEventListener('click', showHistory);

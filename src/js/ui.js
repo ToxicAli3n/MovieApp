@@ -1,4 +1,5 @@
 import { addToFavorites } from './favorites.js';
+import { addToHistory } from './history.js';
 
 const resultContainer = document.getElementById('result');
 const movieListContainer = document.getElementById('movie-list-container');
@@ -33,9 +34,12 @@ export function displayMovie(movie) {
     document.getElementById('add-favorite').addEventListener('click', () => {
         addToFavorites(movie);
     });
+    
+    addToHistory(movie);
 }
 
 export function displayMovies(movies) {
+    resultContainer.innerHTML = `<p class="msg">Search results. Click a movie to view details.</p>`;
     movieListContainer.innerHTML = movies.map(movie => `
         <div class="movie-item" data-title="${movie.Title}">
             <img src="${movie.Poster !== 'N/A' ? movie.Poster : 'no-image.jpg'}" alt="${movie.Title}">
