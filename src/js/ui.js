@@ -4,6 +4,8 @@ const resultContainer = document.getElementById('result');
 const movieListContainer = document.getElementById('movie-list-container');
 
 export function displayMovie(movie) {
+    movieListContainer.innerHTML = '';
+    
     const genres = movie.Genre.split(',').map(g => `<div>${g.trim()}</div>`).join('');
     resultContainer.innerHTML = `
     <div class="info">
