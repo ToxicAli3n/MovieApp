@@ -1,24 +1,21 @@
+import { getItem, removeItem, setItem } from './storage.js';
 const movieListContainer = document.getElementById('movie-list-container');
 const resultContainer = document.getElementById('result');
 
 export function addToHistory(movie) {
-    let history = JSON.parse(localStorage.getItem('history')) || [];
-    
+    let history = getItem('history') || [];
     history = history.filter(h => h.imdbID !== movie.imdbID);
-    
     history.unshift({
         imdbID: movie.imdbID,
         Title: movie.Title,
         Year: movie.Year,
         Poster: movie.Poster
     });
-    
-    localStorage.setItem('history', JSON.stringify(history));
+    setItem('history', history.slice(0, 10));
 }
 
 export function showHistory() {
-    const history = JSON.parse(localStorage.getItem('history')) || [];
-    
+    const history = getItem('history');
     if (history.length === 0) {
         movieListContainer.innerHTML = `<p class="msg">No movies in your viewing history yet.</p>`;
         resultContainer.innerHTML = `<p class="msg">Your viewing history is empty.</p>`;
@@ -43,8 +40,10 @@ export function showHistory() {
 }
 
 export function removeFromHistory(imdbID) {
-    let history = JSON.parse(localStorage.getItem('history')) || [];
-    history = history.filter(movie => movie.imdbID !== imdbID);
-    localStorage.setItem('history', JSON.stringify(history));
+    removeItem('history', imdbID);
     showHistory();
+}
+
+export function getHistory() {
+    return getItem('history');
 }
