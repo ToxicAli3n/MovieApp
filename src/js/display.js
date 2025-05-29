@@ -1,5 +1,5 @@
-import { addToFavorites, showFavorites } from './favorites.js';
-import { addToHistory, showHistory } from './history.js';
+import { addToFavorites } from './favorites.js';
+import { addToHistory } from './history.js';
 
 const resultContainer = document.getElementById('result');
 const movieListContainer = document.getElementById('movie-list-container');
@@ -47,13 +47,5 @@ export class MovieRenderer {
                 <span>${movie.Title} (${movie.Year})</span>
             </div>
         `).join('');
-    }
-    
-    static showFavorites(favorites) {
-        showFavorites(favorites);
-    }
-    
-    static showHistory(history) {
-        showHistory(history);
     }
 }

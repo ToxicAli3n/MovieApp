@@ -1,8 +1,7 @@
 import { API_KEY } from '../config/config.js';
 import { fetchMovie, fetchMovieDetails } from './api.js';
-import { getFavorites } from './favorites.js';
-import { getHistory } from './history.js';
-import { MovieRenderer } from './display.js';
+import { getFavorites, showFavorites } from './favorites.js';
+import { showHistory } from './history.js';
 
 const searchInput = document.getElementById('search');
 const searchButton = document.getElementById('search-button');
@@ -89,10 +88,9 @@ document.addEventListener('click', (e) => {
 
 showFavoritesButton.addEventListener('click', () => {
     const favorites = getFavorites();
-    MovieRenderer.showFavorites(favorites);
+    showFavorites(favorites);
 });
 
 showHistoryButton.addEventListener('click', () => {
-    const history = getHistory();
-    MovieRenderer.showHistory(history);
+    showHistory();
 });

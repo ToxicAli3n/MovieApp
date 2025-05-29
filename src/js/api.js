@@ -1,5 +1,5 @@
 import { API_KEY } from '../config/config.js';
-import { displayMovie, displayMovies } from './ui.js';
+import { MovieRenderer } from './display.js';
 
 const movieListContainer = document.getElementById('movie-list-container');
 
@@ -19,7 +19,7 @@ export async function fetchMovieDetails(title) {
         if (data.Response === 'False') {
             throw new Error('Movie not found');
         }
-        displayMovie(data);
+        MovieRenderer.displayMovie(data);
     } catch (err) {
         console.error('Error fetching movie details:', err);
         movieListContainer.innerHTML = `<p class="msg">Error: ${err.message}</p>`;
@@ -34,7 +34,7 @@ export async function fetchMovies(query) {
             throw new Error('No movies found');
         }
         const limitedResults = data.Search.slice(0, 8);
-        displayMovies(limitedResults);
+        MovieRenderer.displayMovies(limitedResults);
     } catch (err) {
         console.error('Error fetching movies:', err);
         movieListContainer.innerHTML = `<p class="msg">Error: ${err.message}</p>`;
