@@ -1,34 +1,35 @@
 class EventManager {
     constructor() {
-        this.events = {};
+        this.events = new Map();
     }
     
-    subscribe(eventType, callback) {
+    on(eventType, callback) {
         if (typeof callback !== 'function') {
             throw new Error('no function');
         }
         
-        if (!this.events[eventType]) {
-            this.events[eventType] = [];
+        if (!this.events.has(eventType)) {
+            this.events.set(eventType, []);
         }
         
-        this.events[eventType].push(callback);
+        this.events.get(eventType).push(callback);
         
-        return () => this.unsubscribe(eventType, callback);
+        return () => this.off(eventType, callback);
     }
     
-    unsubscribe(eventType, callback) {
-        if (this.events[eventType]) {
-            const index = this.events[eventType].indexOf(callback);
+    off(eventType, callback) {
+        if (this.events.has(eventType)) {
+            const callbacks = this.events.get(eventType);
+            const index = callbacks.indexOf(callback);
             if (index > -1) {
-                this.events[eventType].splice(index, 1);
+                callbacks.splice(index, 1);
             }
         }
     }
     
-    notify(eventType, data) {
-        if (this.events[eventType]) {
-            this.events[eventType].forEach(callback => {
+    emit(eventType, data) {
+        if (this.events.has(eventType)) {
+            this.events.get(eventType).forEach(callback => {
                 try {
                     callback(data);
                 } catch (error) {
@@ -37,14 +38,23 @@ class EventManager {
             });
         }
     }
+    
+    clear(eventType) {
+        if (eventType) {
+            this.events.delete(eventType);
+        } else {
+            this.events.clear();
+        }
+    }
 }
 
 const eventManager = new EventManager();
 
-const unsubscribe = eventManager.subscribe('test', (data) => {
-    console.log('R:', data);
-});
+eventManager.on('click', (data) => console.log('Click:', data));
+eventManager.on('hover', (data) => console.log('Hover:', data));
 
-eventManager.notify('test', 'Hello!');
-unsubscribe();
-eventManager.notify('test', 'World!');
+eventManager.emit('click', 'clicked');
+eventManager.emit('hover', 'el');
+
+eventManager.clear();
+eventManager.emit('hover', 'clear');
