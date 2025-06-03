@@ -1,49 +1,64 @@
 import { getItem, removeItem, setItem } from './storage.js';
-const movieListContainer = document.getElementById('movie-list-container');
-const resultContainer = document.getElementById('result');
+import { eventManager, EVENT_TYPES } from './pattern.js';
 
-export function addToHistory(movie) {
-    let history = getItem('history') || [];
-    history = history.filter(h => h.imdbID !== movie.imdbID);
-    history.unshift({
-        imdbID: movie.imdbID,
-        Title: movie.Title,
-        Year: movie.Year,
-        Poster: movie.Poster
-    });
-    setItem('history', history.slice(0, 10));
-}
-
-export function showHistory() {
-    const history = getItem('history');
-    if (history.length === 0) {
-        movieListContainer.innerHTML = `<p class="msg">No movies in your viewing history yet.</p>`;
-        resultContainer.innerHTML = `<p class="msg">Your viewing history is empty.</p>`;
-        return;
+export class HistoryManager {
+    static init() {
+        eventManager.on(EVENT_TYPES.MOVIE_SELECTED, (data) => {
+            this.addToHistory(data.movie);
+        });
+        
+        eventManager.on(EVENT_TYPES.HISTORY_UPDATED, (data) => {
+            switch (data.action) {
+                case 'remove':
+                    this.removeFromHistory(data.imdbID);
+                    break;
+                case 'show':
+                    break;
+                case 'get':
+                    eventManager.emit(EVENT_TYPES.HISTORY_UPDATED, {
+                        action: 'show',
+                        history: this.getHistory()
+                    });
+                    break;
+            }
+        });
     }
     
-    movieListContainer.innerHTML = history.map(movie => `
-        <div class="movie-item" data-title="${movie.Title}">
-            <img src="${movie.Poster !== 'N/A' ? movie.Poster : 'no-image.jpg'}" alt="${movie.Title}">
-            <span>${movie.Title} (${movie.Year})</span>
-            <button class="remove-from-history" data-id="${movie.imdbID}" title="Remove from history">✖</button>
-        </div>
-    `).join('');
-    resultContainer.innerHTML = `<p class="msg">Click a movie from history to view details.</p>`;
-    
-    document.querySelectorAll('.remove-from-history').forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.stopPropagation();
-            removeFromHistory(e.target.dataset.id);
+    static addToHistory(movie) {
+        let history = getItem('history') || [];
+        history = history.filter(h => h.imdbID !== movie.imdbID);
+        history.unshift({
+            imdbID: movie.imdbID,
+            Title: movie.Title,
+            Year: movie.Year,
+            Poster: movie.Poster
         });
-    });
-}
-
-export function removeFromHistory(imdbID) {
-    removeItem('history', imdbID);
-    showHistory();
-}
-
-export function getHistory() {
-    return getItem('history');
+        setItem('history', history.slice(0, 10));
+        
+        eventManager.emit(EVENT_TYPES.HISTORY_UPDATED, {
+            action: 'added',
+            movie: movie,
+            history: this.getHistory()
+        });
+    }
+    
+    static removeFromHistory(imdbID) {
+        removeItem('history', imdbID);
+        
+        eventManager.emit(EVENT_TYPES.HISTORY_UPDATED, {
+            action: 'show',
+            history: this.getHistory()
+        });
+    }
+    
+    static getHistory() {
+        return getItem('history');
+    }
+    
+    static showHistory() {
+        eventManager.emit(EVENT_TYPES.HISTORY_UPDATED, {
+            action: 'show',
+            history: this.getHistory()
+        });
+    }
 }

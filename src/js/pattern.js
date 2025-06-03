@@ -1,4 +1,13 @@
-class EventManager {
+export const EVENT_TYPES = {
+    FAVORITES_UPDATED: 'favorites_updated',
+    HISTORY_UPDATED: 'history_updated',
+    MOVIE_SELECTED: 'movie_selected',
+    SEARCH_RESULTS_UPDATED: 'search_results_updated',
+    MOVIE_DETAILS_LOADED: 'movie_details_loaded',
+    SEARCH_PERFORMED: 'search_performed'
+};
+
+export class EventManager {
     constructor() {
         this.events = new Map();
     }
@@ -9,20 +18,20 @@ class EventManager {
         }
         
         if (!this.events.has(eventType)) {
-            this.events.set(eventType, []);
+            this.events.set(eventType, new Set());
         }
         
-        this.events.get(eventType).push(callback);
+        this.events.get(eventType).add(callback);
         
         return () => this.off(eventType, callback);
     }
     
     off(eventType, callback) {
         if (this.events.has(eventType)) {
-            const callbacks = this.events.get(eventType);
-            const index = callbacks.indexOf(callback);
-            if (index > -1) {
-                callbacks.splice(index, 1);
+            this.events.get(eventType).delete(callback);
+            
+            if (this.events.get(eventType).size === 0) {
+                this.events.delete(eventType);
             }
         }
     }
@@ -39,6 +48,19 @@ class EventManager {
         }
     }
     
+    once(eventType, callback) {
+        if (typeof callback !== 'function') {
+            throw new Error('no function');
+        }
+        
+        const onceWrapper = (data) => {
+            callback(data);
+            this.off(eventType, onceWrapper);
+        };
+        
+        return this.on(eventType, onceWrapper);
+    }
+    
     clear(eventType) {
         if (eventType) {
             this.events.delete(eventType);
@@ -48,13 +70,4 @@ class EventManager {
     }
 }
 
-const eventManager = new EventManager();
-
-eventManager.on('click', (data) => console.log('Click:', data));
-eventManager.on('hover', (data) => console.log('Hover:', data));
-
-eventManager.emit('click', 'clicked');
-eventManager.emit('hover', 'el');
-
-eventManager.clear();
-eventManager.emit('hover', 'clear');
+export const eventManager = new EventManager();

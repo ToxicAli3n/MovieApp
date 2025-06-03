@@ -1,47 +1,63 @@
 import { getItem, addItem, removeItem } from './storage.js';
-const movieListContainer = document.getElementById('movie-list-container');
-const resultContainer = document.getElementById('result');
+import { eventManager, EVENT_TYPES } from './pattern.js';
 
-export function addToFavorites(movie) {
-    addItem('favorites', {
-        imdbID: movie.imdbID,
-        Title: movie.Title,
-        Year: movie.Year,
-        Poster: movie.Poster
-    });
-    alert(`${movie.Title} added to favorites!`);
-}
-
-export function showFavorites(favorites) {
-    if (favorites.length === 0) {
-        movieListContainer.innerHTML = `<p class="msg">No favorite movies yet.</p>`;
-        resultContainer.innerHTML = `<p class="msg">Please select a movie</p>`;
-        return;
+export class FavoritesManager {
+    static init() {
+        eventManager.on(EVENT_TYPES.FAVORITES_UPDATED, (data) => {
+            switch (data.action) {
+                case 'add':
+                    this.addToFavorites(data.movie);
+                    break;
+                case 'remove':
+                    this.removeFromFavorites(data.imdbID);
+                    break;
+                case 'show':
+                    break;
+                case 'get':
+                    eventManager.emit(EVENT_TYPES.FAVORITES_UPDATED, {
+                        action: 'show',
+                        favorites: this.getFavorites()
+                    });
+                    break;
+            }
+        });
     }
     
-    movieListContainer.innerHTML = favorites.map(movie => `
-        <div class="movie-item" data-title="${movie.Title}">
-            <img src="${movie.Poster !== 'N/A' ? movie.Poster : 'no-image.jpg'}" alt="${movie.Title}">
-            <span>${movie.Title} (${movie.Year})</span>
-            <button class="remove-favorite" data-id="${movie.imdbID}" title="Remove from favorites">✖</button>
-        </div>
-    `).join('');
-    resultContainer.innerHTML = `<p class="msg">Click a movie to view details.</p>`;
-    
-    document.querySelectorAll('.remove-favorite').forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.stopPropagation();
-            removeFromFavorites(e.target.dataset.id);
+    static addToFavorites(movie) {
+        addItem('favorites', {
+            imdbID: movie.imdbID,
+            Title: movie.Title,
+            Year: movie.Year,
+            Poster: movie.Poster
         });
-    });
-}
-
-export function removeFromFavorites(imdbID) {
-    removeItem('favorites', imdbID);
-    alert('Movie removed from favorites!');
-    showFavorites(getFavorites());
-}
-
-export function getFavorites() {
-    return getItem('favorites');
+        
+        alert(`${movie.Title} added to favorites!`);
+        
+        eventManager.emit(EVENT_TYPES.FAVORITES_UPDATED, {
+            action: 'added',
+            movie: movie,
+            favorites: this.getFavorites()
+        });
+    }
+    
+    static removeFromFavorites(imdbID) {
+        removeItem('favorites', imdbID);
+        alert('Movie removed from favorites!');
+        
+        eventManager.emit(EVENT_TYPES.FAVORITES_UPDATED, {
+            action: 'show',
+            favorites: this.getFavorites()
+        });
+    }
+    
+    static getFavorites() {
+        return getItem('favorites');
+    }
+    
+    static showFavorites() {
+        eventManager.emit(EVENT_TYPES.FAVORITES_UPDATED, {
+            action: 'show',
+            favorites: this.getFavorites()
+        });
+    }
 }

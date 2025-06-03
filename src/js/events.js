@@ -1,7 +1,8 @@
 import { API_KEY } from '../config/config.js';
 import { fetchMovie, fetchMovieDetails } from './api.js';
-import { getFavorites, showFavorites } from './favorites.js';
-import { showHistory } from './history.js';
+import { FavoritesManager } from './favorites.js';
+import { HistoryManager } from './history.js';
+import { eventManager, EVENT_TYPES } from './pattern.js';
 
 const searchInput = document.getElementById('search');
 const searchButton = document.getElementById('search-button');
@@ -55,9 +56,10 @@ searchInput.addEventListener('input', async (e) => {
                 <span>${movie.Title} (${movie.Year})</span>
             </div>`
         ).join('');
+        
         dropdown.style.display = 'block';
     } catch (err) {
-        console.error('Error fetching dropdown movies:', err);
+        console.error('Error:', err);
         dropdown.style.display = 'none';
     }
 });
@@ -87,10 +89,22 @@ document.addEventListener('click', (e) => {
 });
 
 showFavoritesButton.addEventListener('click', () => {
-    const favorites = getFavorites();
-    showFavorites(favorites);
+    FavoritesManager.showFavorites();
 });
 
 showHistoryButton.addEventListener('click', () => {
-    showHistory();
+    HistoryManager.showHistory();
 });
+
+function initializeApp() {
+    FavoritesManager.init();
+    HistoryManager.init();
+    
+    eventManager.on(EVENT_TYPES.SEARCH_PERFORMED, (data) => {
+    });
+    
+    eventManager.on(EVENT_TYPES.MOVIE_SELECTED, (data) => {
+    });
+}
+
+initializeApp();
