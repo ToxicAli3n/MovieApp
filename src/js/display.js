@@ -1,10 +1,31 @@
-import { addToFavorites } from './favorites.js';
-import { addToHistory } from './history.js';
+import { eventManager, EVENT_TYPES } from './pattern.js';
 
 const resultContainer = document.getElementById('result');
 const movieListContainer = document.getElementById('movie-list-container');
 
 export class MovieRenderer {
+    static init() {
+        eventManager.on(EVENT_TYPES.MOVIE_DETAILS_LOADED, (data) => {
+            this.displayMovie(data.movie);
+        });
+        
+        eventManager.on(EVENT_TYPES.SEARCH_RESULTS_UPDATED, (data) => {
+            this.displayMovies(data.movies);
+        });
+        
+        eventManager.on(EVENT_TYPES.FAVORITES_UPDATED, (data) => {
+            if (data.action === 'show') {
+                this.showFavorites(data.favorites);
+            }
+        });
+        
+        eventManager.on(EVENT_TYPES.HISTORY_UPDATED, (data) => {
+            if (data.action === 'show') {
+                this.showHistory(data.history);
+            }
+        });
+    }
+    
     static displayMovie(movie) {
         movieListContainer.innerHTML = '';
         
@@ -32,11 +53,13 @@ export class MovieRenderer {
         <h3>Cast:</h3>
         <p>${movie.Actors}</p>
         `;
-        document.getElementById('add-favorite').addEventListener('click', () => {
-            addToFavorites(movie);
-        });
         
-        addToHistory(movie);
+        document.getElementById('add-favorite').addEventListener('click', () => {
+            eventManager.emit(EVENT_TYPES.FAVORITES_UPDATED, {
+                action: 'add',
+                movie: movie
+            });
+        });
     }
     
     static displayMovies(movies) {
@@ -47,5 +70,59 @@ export class MovieRenderer {
                 <span>${movie.Title} (${movie.Year})</span>
             </div>
         `).join('');
+    }
+    
+    static showFavorites(favorites) {
+        if (favorites.length === 0) {
+            movieListContainer.innerHTML = `<p class="msg">No favorite movies yet.</p>`;
+            resultContainer.innerHTML = `<p class="msg">Please select a movie</p>`;
+            return;
+        }
+        
+        movieListContainer.innerHTML = favorites.map(movie => `
+            <div class="movie-item" data-title="${movie.Title}">
+                <img src="${movie.Poster !== 'N/A' ? movie.Poster : 'no-image.jpg'}" alt="${movie.Title}">
+                <span>${movie.Title} (${movie.Year})</span>
+                <button class="remove-favorite" data-id="${movie.imdbID}" title="Remove from favorites">✖</button>
+            </div>
+        `).join('');
+        resultContainer.innerHTML = `<p class="msg">Click a movie to view details.</p>`;
+        
+        document.querySelectorAll('.remove-favorite').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                eventManager.emit(EVENT_TYPES.FAVORITES_UPDATED, {
+                    action: 'remove',
+                    imdbID: e.target.dataset.id
+                });
+            });
+        });
+    }
+    
+    static showHistory(history) {
+        if (history.length === 0) {
+            movieListContainer.innerHTML = `<p class="msg">No movies in your viewing history yet.</p>`;
+            resultContainer.innerHTML = `<p class="msg">Your viewing history is empty.</p>`;
+            return;
+        }
+        
+        movieListContainer.innerHTML = history.map(movie => `
+            <div class="movie-item" data-title="${movie.Title}">
+                <img src="${movie.Poster !== 'N/A' ? movie.Poster : 'no-image.jpg'}" alt="${movie.Title}">
+                <span>${movie.Title} (${movie.Year})</span>
+                <button class="remove-from-history" data-id="${movie.imdbID}" title="Remove from history">✖</button>
+            </div>
+        `).join('');
+        resultContainer.innerHTML = `<p class="msg">Click a movie from history to view details.</p>`;
+        
+        document.querySelectorAll('.remove-from-history').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                eventManager.emit(EVENT_TYPES.HISTORY_UPDATED, {
+                    action: 'remove',
+                    imdbID: e.target.dataset.id
+                });
+            });
+        });
     }
 }
